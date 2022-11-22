@@ -1,16 +1,10 @@
 import React, { useState, useEffect }  from "react";
 import * as likeService from "../../services/likes-service";
-
-const TuitStats = ({tuit, likeTuit = () => {}}) => {
-
-    /**
-     * Use useState and useEffect to change like button and dislike button status.
-     */
+import * as dislikeService from "../../services/dislikes-service";
+const TuitStats = ({tuit, likeTuit = () => {},dislikeTuit=()=>{}}) => {
     const [hasLiked, setHasLike] = useState(null);
+    const [hasDisliked, setHasDisliked] = useState(null);
 
-    /**
-     * Check if a tuit has been liked by user or not.
-     */
     const checkLike = async() => {
       const userLiked = await likeService.userLikesTuit("me",tuit._id);
       if (userLiked.length===1) {
@@ -21,13 +15,25 @@ const TuitStats = ({tuit, likeTuit = () => {}}) => {
       }
     }
 
+    const checkDislike = async() => {
+      const userDisliked = await dislikeService.userDislikesTuit("me",tuit._id);
+      if (userDisliked.length===1) {
+        setHasDisliked(false);
 
-    /**
-     * The onClick function on like button.
-     */
+      }else{
+        setHasDisliked(true)
+      }
+    }
+
+
     const clickOnLike = async() => {
       likeTuit(tuit);
       await checkLike();
+    }
+
+    const clickOnDislike = async() => {
+      dislikeTuit(tuit);
+      await checkDislike();
     }
 
     return (
@@ -41,7 +47,6 @@ const TuitStats = ({tuit, likeTuit = () => {}}) => {
           {tuit.stats && tuit.stats.retuits}
         </div>
 
-        {/** like button */  }
         <div className="col">
           <span onClick={() => clickOnLike()}>
               {
@@ -57,7 +62,22 @@ const TuitStats = ({tuit, likeTuit = () => {}}) => {
 
           </span>
           </div>
-        
+            <div className="col">
+          <span onClick={() => clickOnDislike()}>
+              {
+                hasDisliked ? (
+                  <i className="fa-solid fa-thumbs-down"></i>
+                ) : (
+                  <i className="fa-regular fa-thumbs-down"></i>
+                )
+
+              }
+
+            {tuit.stats && tuit.stats.dislikes}
+
+          </span>
+          </div>
+
       </div>
     );
 }

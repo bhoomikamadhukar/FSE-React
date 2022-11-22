@@ -15,3 +15,11 @@ export const userLikesTuit = async (uid, tid) => {
    const response = await api.get(`${USERS_API}/${uid}/liked/${tid}`);
    return response.data;
 }
+ export const findAllTuitsLikedByUser = async(userId) =>{
+     const response = await  api.get(`${USERS_API}/${userId}/likes`);
+     return response.data;
+ }
+ export const userHasLikedTuit = async (uid, tid) => {
+     const response = await api.get(`${USERS_API}/${uid}/userLiked/${tid}`);
+     return response.data;
+ }
