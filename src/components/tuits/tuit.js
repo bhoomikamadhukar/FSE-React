@@ -20,7 +20,6 @@ const Tuit = ({tuit, deleteTuit, likeTuit, dislikeTuit}) => {
           {tuit.postedBy.username && tuit.postedBy.username}
           @{tuit.postedBy && tuit.postedBy.username} -
           {tuit.published}</h2>
-          {/* Public date is named as postedOn in the node project. */}
         {tuit.tuit}
         {
           tuit.youtube &&
