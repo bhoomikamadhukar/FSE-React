@@ -1,3 +1,5 @@
+
+
 import {useEffect, useState} from "react";
 import * as service from "../../services/tuits-service";
 import Tuits from "../tuits";
@@ -5,7 +7,7 @@ import Tuits from "../tuits";
 const MyTuits = () => {
   const [tuits, setTuits] = useState([]);
   const findMyTuits = () =>
-    service.findAllTuitsByUser("me")
+    service.findTuitByUser("me")
       .then(tuits => setTuits(tuits));
   useEffect(findMyTuits, []);
   const deleteTuit = (tid) =>
@@ -13,7 +15,8 @@ const MyTuits = () => {
       .then(findMyTuits);
   return(
     <Tuits tuits={tuits}
-           deleteTuit={deleteTuit}/>
+           deleteTuit={deleteTuit} refreshTuits={findMyTuits}
+           />
   );
 };
 

@@ -10,16 +10,17 @@ const Tuit = ({tuit, deleteTuit, likeTuit, dislikeTuit}) => {
         {
           tuit.postedBy &&
           <img src={`../images/${tuit.postedBy.username}.jpg`}
-               width = "50" height = "50"/>
+               className="ttr-tuit-avatar-logo rounded-circle" width='50px'/>
         }
-  </div>
+      </div>
       <div className="w-100">
           <i onClick={() => deleteTuit(tuit._id)} className="fas fa-remove fa-2x fa-pull-right"></i>
         <h2
           className="fs-5">
-          {tuit.postedBy.username && tuit.postedBy.username}
+          {tuit.postedBy && tuit.postedBy.username}
           @{tuit.postedBy && tuit.postedBy.username} -
           {tuit.published}</h2>
+
         {tuit.tuit}
         {
           tuit.youtube &&
@@ -31,7 +32,6 @@ const Tuit = ({tuit, deleteTuit, likeTuit, dislikeTuit}) => {
         }
         <TuitStats tuit={tuit} likeTuit={likeTuit} dislikeTuit={dislikeTuit}/>
       </div>
-
     </li>
   );
 }

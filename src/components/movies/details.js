@@ -4,6 +4,7 @@ import {useParams} from "react-router-dom";
 const MovieDetails = () => {
   //https://www.omdbapi.com/?i=tt11651768&apikey=852159f0
   const {imdbID} = useParams()
+  console.log(imdbID)
   const [movie, setMovie] = useState({});
   useEffect(() => {
     fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=852159f0`)
