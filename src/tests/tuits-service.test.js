@@ -1,131 +1,145 @@
 import {
-  createTuit,
-  deleteTuit,
   findAllTuits,
+  findAllTuitsByUser,
   findTuitById,
-  findTuitByUser
+  createTuitByUser,
+  updateTuit,
+  deleteTuit
 } from "../services/tuits-service";
-
 import {
   createUser,
-  deleteUsersByUsername
+  deleteUsersByUsername, findAllUsers, findUserById
 } from "../services/users-service";
 
-describe('can create tuit with REST API, createTuit', () => {
-  const testTuit = {
-    tuit: 'Hey I am a test tuit',
-    postedBy: '6355b899964d226fbf632852'
-  }
-  let tid;
-  let newTuit;
-  beforeAll(async () => {
-    newTuit = await createTuit(testTuit.postedBy, testTuit);
+describe('create a tuit by a valid user', () => {
+  const ellen = {
+      username: 'ellen_ripley',
+      password: 'lv426',
+      email: 'repley@weyland.com'
+  };
+const testTuit = 'This is a test';
+  beforeAll(() => {
+      return deleteUsersByUsername(ellen.username);
   })
 
-
-  afterAll(() =>
-  {
-    return deleteTuit(tid);
-  });
+  afterAll(() => {
+      return deleteUsersByUsername(ellen.username);
+  })
 
   test('can create tuit with REST API', async () => {
-    tid = newTuit._id;
-    expect(newTuit.tuit).toEqual(testTuit.tuit);
-    expect(newTuit.postedBy).toEqual(testTuit.postedBy);
+      const test_user = await createUser(ellen);
 
+
+      const newTuit = await createTuitByUser(test_user._id, testTuit);
+      expect(newTuit.tuit).toEqual('This is a test');
+      expect(newTuit.postedBy).toEqual(test_user._id);
+
+      await deleteTuit(newTuit._id);
+  })
+});
+
+describe('find a tuit by using ID', () => {
+  const ellen = {
+      username: 'ellen_ripley',
+      password: 'lv426',
+      email: 'repley@weyland.com'
+  };
+const testTuit = 'This is a test';
+  beforeAll(() => {
+      return deleteUsersByUsername(ellen.username);
+  })
+
+  afterAll(() => {
+      return deleteUsersByUsername(ellen.username);
+  })
+
+  test('can get a tuit by ID with REST API', async () => {
+      const test_user = await createUser(ellen);
+
+      let currPostedBy;
+
+      const newTuit = await createTuitByUser(test_user._id, testTuit);
+      expect(newTuit.tuit).toEqual('This is a test');
+      expect(newTuit.postedBy).toEqual(test_user._id);
+      const tid = newTuit._id
+      const currTuit = await findTuitById(tid);
+      currPostedBy = currTuit.postedBy._id
+      expect(currTuit.tuit).toEqual(newTuit.tuit);
+      expect(currPostedBy).toEqual(newTuit.postedBy);
+      await deleteTuit(newTuit._id);
   })
 });
 
 
-describe('can delete tuit with REST API', () => {
-  const testTuit = {
-    tuit: 'Hey I am a test tuit to be deleted',
-    postedBy: '6355b899964d226fbf632852'
-  }
-  let tid;
-  let newTuit;
+describe('find all tuits', () => {
+  const ellen = {
+      username: 'ellen',
+      password: 'testing123',
+      email: 'test@robot.com'
+  };
+  const testTuits = [
+      'test1', 'test2', 'test3'
+  ];
+
   beforeAll(async () => {
-    newTuit = await createTuit(testTuit.postedBy, testTuit);
+      await deleteUsersByUsername(ellen.username);
   })
 
-
-  afterAll(() =>
-  {
-    return deleteTuit(tid);
-  });
-
-  test('can delete tuit with REST API', async () => {
-    tid = newTuit._id;
-    const deleteCounts = await deleteTuit(tid);
-    expect(deleteCounts.deletedCount).toBeGreaterThanOrEqual(1);
-
-  })
-});
-
-describe('can find tuit with primary key using REST API', () => {
-  const testTuit = {
-    tuit: 'Hey I am a test tuit to be fetched',
-    postedBy: '6355b899964d226fbf632852'
-  }
-  let tid;
-  let newTuit;
-  let currPostedBy;
-  beforeAll(async () => {
-    newTuit = await createTuit(testTuit.postedBy, testTuit);
-  })
-
-
-  afterAll(() =>
-  {
-    return deleteTuit(tid);
-  });
-
-  test('can fetch tuit with REST API', async () => {
-    tid = newTuit._id;
-
-    expect(newTuit.tuit).toEqual(testTuit.tuit);
-    expect(newTuit.postedBy).toEqual(testTuit.postedBy);
-    const currTuit = await findTuitById(tid);
-    currPostedBy = currTuit.postedBy._id
-    expect(currTuit.tuit).toEqual(testTuit.tuit);
-    expect(currPostedBy).toEqual(newTuit.postedBy);
-
-  })
-});
-
-describe('can retrieve all tuits with REST API', () => {
-
-  let testTuits = [{
-    tuit: 'This is a test tuit1',
-    postedBy: '6355b899964d226fbf632852'
-  }, {
-    tuit: 'This is test tuit2',
-    postedBy: '6355b899964d226fbf632852'
-  }, {
-    tuit: 'This is test tuit3',
-    postedBy: '6355b899964d226fbf632852'
-  }]
-  beforeAll(async () => {
-    return Promise.all(
-      testTuits.map(
-        eachTuit =>
-          createTuit(eachTuit.postedBy, eachTuit)));
-  });
-  let postedBy = '6355b899964d226fbf632852';
   afterAll(async () => {
-    const tuitsInserted = await findTuitByUser(postedBy);
-    return Promise.all(tuitsInserted.map(tuit => deleteTuit(tuit._id)));
-  });
+      await deleteUsersByUsername(ellen.username);
+  })
 
   test('can retrieve all tuits with REST API', async () => {
-    const allTuitsFetched = await findAllTuits();
-    expect(allTuitsFetched.length).toBeGreaterThanOrEqual(3);
-    const tuitsWeInserted = allTuitsFetched.filter(
-    tuit => testTuits.indexOf(tuit.tuit) >= 0);
-    tuitsWeInserted.forEach(tuit => {
-    const tuitname = tuitsInserted.find(tuitname => tuitname === tuit.tuit);
-    expect(tuit.tuit).toEqual(tuit);
+      const test_user = await createUser(ellen);
 
-  })
+      testTuits.map(async test => {
+          const newTuit = await createTuitByUser(test_user._id, test);
+          expect(newTuit.tuit).toEqual(test);
+          expect(newTuit.postedBy).toEqual(test_user._id);
+      });
+
+      const fetchAll = await findAllTuits();
+      expect(fetchAll.length).toBeGreaterThanOrEqual(testTuits.length);
+
+      const insertTuit = fetchAll.filter(
+          tuit => testTuits.indexOf(tuit.tuit) >= 0);
+
+
+      insertTuit.forEach(tuit => {
+          const testTuit = testTuits.find(test => test === tuit.tuit);
+          expect(tuit.tuit).toEqual(testTuit);
+
+      });
+
+
+      insertTuit.map(async tuit => {
+          await deleteTuit(tuit._id);
+      })
+  });
 });
+
+describe('delete a tuit', () => {
+  const ellen = {
+      username: 'ellen',
+      password: 'testing123',
+      email: 'test@robot.com'
+  };
+  const testTuit = 'This is a test';
+
+  beforeAll(async () => {
+      await deleteUsersByUsername(ellen.username);
+  })
+
+  afterAll(async () => {
+      await deleteUsersByUsername(ellen.username);
+  })
+
+  test('can delete tuit with REST API', async () => {
+      const newTuit = await createUser(ellen);
+      const createdTuit = await createTuitByUser(newTuit._id, testTuit);
+
+      const del = await deleteTuit(createdTuit._id);
+
+      expect(del.deletedCount).toBeGreaterThanOrEqual(1);
+  })
 });
